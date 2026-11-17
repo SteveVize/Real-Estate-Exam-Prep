@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iowa Real Estate Exam Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a study desk. Left = where you are (units), right = the work (Learn / Drill / Test). Plat-map green for national, Iowa gold for state content. */
+:root{
+  --bg:#f4f6f4; --surface:#ffffff; --ink:#18231f; --muted:#5b6964; --line:#d9e0dc;
+  --accent:#1d6b54; --accent-soft:#e3f0ea; --iowa:#9a6a12; --iowa-soft:#f8eed8;
+  --good:#1f7a3f; --good-soft:#e2f3e7; --bad:#b23a2e; --bad-soft:#f9e4e1;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r:10px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111816; --surface:#18211e; --ink:#e6ece9; --muted:#9aaba4; --line:#2c3a35;
+    --accent:#5cc39f; --accent-soft:#1d3029; --iowa:#e2b35a; --iowa-soft:#33291a;
+    --good:#6fd08f; --good-soft:#1b3122; --bad:#f08a7e; --bad-soft:#3a201d; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111816; --surface:#18211e; --ink:#e6ece9; --muted:#9aaba4; --line:#2c3a35;
+  --accent:#5cc39f; --accent-soft:#1d3029; --iowa:#e2b35a; --iowa-soft:#33291a;
+  --good:#6fd08f; --good-soft:#1b3122; --bad:#f08a7e; --bad-soft:#3a201d; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:1.9rem} h2{font-size:1.45rem} h3{font-size:1.1rem}
+a{color:var(--accent)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:700;font-size:1.1rem;color:var(--ink);text-decoration:none;margin-right:auto;display:flex;gap:8px;align-items:center}
+.brand i{display:inline-block;width:14px;height:14px;border:2px solid var(--accent);border-radius:2px;background:linear-gradient(90deg,transparent 45%,var(--accent) 45% 55%,transparent 55%),linear-gradient(0deg,transparent 45%,var(--accent) 45% 55%,transparent 55%)}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav a{padding:6px 10px;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.92rem}
+.nav a.on,.nav a:hover{background:var(--accent-soft);color:var(--accent)}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 80px}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.chip{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.02em;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);vertical-align:middle}
+.chip.ia{background:var(--iowa-soft);color:var(--iowa)}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:8px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn.good{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.btn.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0 24px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.stat b{display:block;font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:.9rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+.ulist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.urow{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--ink);border-left:4px solid var(--accent)}
+.urow.ia{border-left-color:var(--iowa)}
+.urow:hover{border-color:var(--accent)}
+.urow .num{font-family:var(--display);font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.urow .ttl{font-weight:600;line-height:1.25}
+.urow .pg{font-size:.8rem;color:var(--muted)}
+.marks{display:flex;gap:6px;font-size:.75rem;font-weight:700}
+.mk{padding:2px 7px;border-radius:6px;background:var(--bg);color:var(--muted);border:1px solid var(--line);white-space:nowrap;font-variant-numeric:tabular-nums}
+.mk.on{background:var(--good-soft);color:var(--good);border-color:transparent}
+.mk.mid{background:var(--iowa-soft);color:var(--iowa);border-color:transparent}
+.mk.low{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:6px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:16px 0 18px}
+.tabs a{padding:10px 16px;text-decoration:none;color:var(--muted);font-weight:700;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs a.on{color:var(--accent);border-bottom-color:var(--accent)}
+.prose{max-width:72ch}
+.prose p{margin:.55em 0}
+.prose ul{margin:.3em 0 .9em;padding-left:1.3em}
+.prose li{margin:.2em 0}
+.review p{font-weight:600;margin-top:1em}
+.tip{background:var(--iowa-soft);border-left:4px solid var(--iowa);padding:10px 14px;border-radius:6px;margin:10px 0}
+.tip b{color:var(--iowa);font-size:.8rem;letter-spacing:.06em}
+details.sec{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:6px 0}
+details.sec summary{padding:10px 14px;cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:10px}
+details.sec[open] summary{border-bottom:1px solid var(--line)}
+details.sec .prose{padding:4px 16px 12px}
+.pref{font-size:.8rem;color:var(--muted);font-weight:400;white-space:nowrap}
+.card{min-height:260px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px;display:flex;flex-direction:column;justify-content:center;gap:12px;cursor:pointer;box-shadow:0 1px 0 var(--line)}
+.card .face{font-size:1.15rem}
+.card .term{font-family:var(--display);font-size:1.8rem;font-weight:700}
+.card .lbl{font-size:.75rem;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+.card .ans{color:var(--accent);font-weight:700}
+.blank{display:inline-block;min-width:3.5em;border-bottom:2px solid var(--accent);color:transparent}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.q{max-width:760px}
+.q .stem{font-size:1.12rem;margin:8px 0 14px}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.choice:hover:not([disabled]){border-color:var(--accent)}
+.choice.right{background:var(--good-soft);border-color:var(--good);color:var(--good);font-weight:700}
+.choice.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.fb{margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--line)}
+.fb.ok{border-color:var(--good)} .fb.no{border-color:var(--bad)}
+input[type=search],input[type=date],select{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+input[type=search]{width:100%;max-width:560px}
+mark{background:var(--iowa-soft);color:var(--ink);padding:0 2px;border-radius:3px}
+.hit{padding:12px 0;border-bottom:1px solid var(--line)}
+.hit a{font-weight:700;text-decoration:none}
+.list-plain{list-style:none;padding:0;margin:0}
+.list-plain li{padding:8px 0;border-bottom:1px solid var(--line)}
+.ok-t{color:var(--good);font-weight:700}.no-t{color:var(--bad);font-weight:700}
+.sync{font-size:.85rem;color:var(--muted)}
+.who{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--iowa-soft);color:var(--iowa);font-weight:700;text-decoration:none}
+.who::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--iowa)}
+.plist{display:flex;flex-direction:column;gap:8px;max-width:520px}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.prow.on{border-color:var(--accent);background:var(--accent-soft)}
+input[type=text]{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.danger{border:1px solid var(--bad);border-radius:var(--r);padding:18px;background:var(--surface)}
+.note{padding:10px 14px;border-radius:8px;background:var(--iowa-soft);border-left:4px solid var(--iowa);margin:0 0 18px}
+.hide{display:none!important}
+table.br{border-collapse:collapse;width:100%;font-size:.92rem}
+table.br td,table.br th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+table.br td.n{text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:600px){.top{position:static}.top-in{padding:8px 12px}.nav a{padding:5px 8px}h1{font-size:1.5rem}.urow{grid-template-columns:30px 1fr}.urow .marks{grid-column:2}}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <a class="brand" href="#home"><i></i>Iowa RE Exam Prep</a>
+  <nav class="nav" id="nav">
+    <a href="#home" data-r="home">Units</a>
+    <a href="#mock" data-r="mock">Mock exam</a>
+    <a href="#weak" data-r="weak">Weak spots</a>
+    <a href="#numbers" data-r="numbers">Numbers to know</a>
+    <a href="#search" data-r="search">Search</a>
+  </nav>
+  <span class="sync" id="sync"></span>
+</div></header>
+<main id="app"><p class="muted">Loading your study guide…</p></main>
+<script>
+"use strict";
+let D=[]; // units
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+
+/* ---------- profiles + progress (saved in this browser) ---------- */
+const BLANK=()=>({rev:{},cards:{},qs:{},tests:{},mocks:[],exam:'',backupAt:0});
+const PK='iare-profiles-v1';
+let P={list:[],cur:null};
+let S=BLANK();
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
+function lsDel(k){try{localStorage.removeItem(k)}catch(e){}}
+try{const v=lsGet(PK); if(v) P=JSON.parse(v);}catch(e){}
+// carry over progress saved before profiles existed
+(function migrate(){const old=lsGet('iare-progress-v1'); if(old&&!P.list.length){const id='p'+Date.now().toString(36); P.list.push({id,name:'Me',created:Date.now()}); P.cur=id; lsSet('iare-p-'+id,old); lsSet(PK,JSON.stringify(P)); lsDel('iare-progress-v1');}})();
+const curProfile=()=>P.list.find(p=>p.id===P.cur)||null;
+function loadProfile(){S=BLANK(); const p=curProfile(); if(!p) return; try{const v=lsGet('iare-p-'+p.id); if(v) S=Object.assign(BLANK(),JSON.parse(v));}catch(e){}}
+loadProfile();
+let saveOK=true;
+function save(){const p=curProfile(); if(!p) return; saveOK=lsSet('iare-p-'+p.id,JSON.stringify(S)); setSync();}
+function saveProfiles(){lsSet(PK,JSON.stringify(P));}
+function setSync(){const el=$('#sync'); const p=curProfile(); if(!el) return;
+  el.innerHTML=p?`<a href="#account" class="who" title="Your profile, backup and reset">${esc(p.name)}</a>`+(saveOK?'':' <span class="no-t">Not saving: browser storage is blocked</span>'):'';}
+function createProfile(name){const id='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); P.list.push({id,name,created:Date.now()}); P.cur=id; saveProfiles(); loadProfile(); save();}
+function switchProfile(id){P.cur=id; saveProfiles(); loadProfile(); setSync();}
+function backupFile(){
+  const p=curProfile(); S.backupAt=Date.now(); save();
+  const body=JSON.stringify({app:'iowa-re-exam-prep',version:1,profile:p.name,exported:new Date().toISOString(),progress:S},null,1);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([body],{type:'application/json'}));
+  const d=new Date(); a.download=`exam-prep-backup-${p.name.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
+function mergeState(a,b){
+  const o=JSON.parse(JSON.stringify(a));
+  for(const k of ['rev']) o[k]=Object.assign({},b[k]||{},a[k]||{});
+  for(const k of ['cards','qs']){o[k]=o[k]||{}; for(const [id,v] of Object.entries(b[k]||{})){const m=o[k][id]; if(!m||(v.t||0)>(m.t||0)) o[k][id]=v;}}
+  o.tests=o.tests||{}; for(const [u,v] of Object.entries(b.tests||{})){const m=o.tests[u]; if(!m) o.tests[u]=v; else o.tests[u]={best:Math.max(m.best,v.best),last:(v.t||0)>(m.t||0)?v.last:m.last,t:Math.max(m.t||0,v.t||0)}}
+  const seen=new Set((o.mocks||[]).map(m=>m.t)); o.mocks=(o.mocks||[]).concat((b.mocks||[]).filter(m=>!seen.has(m.t))).sort((x,y)=>x.t-y.t).slice(-30);
+  o.exam=a.exam||b.exam||''; return o;
+}
+function mark(kind,id,ok){const r=S[kind][id]||{h:0,m:0}; ok?r.h++:r.m++; r.last=ok?1:0; r.t=Date.now(); S[kind][id]=r; save();}
+
+/* ---------- content helpers ---------- */
+function blocksHTML(bl){
+  return bl.map(b=>{
+    if(b.t==='ul') return '<ul>'+b.i.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+    if(b.x.startsWith('IN PRACTICE')) return '<div class="tip"><b>IN PRACTICE</b><div>'+esc(b.x.slice(11).trim())+'</div></div>';
+    return '<p>'+esc(b.x)+'</p>';
+  }).join('');
+}
+const listHTML=l=>l&&l.length?'<ul>'+l.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'';
+const blankHTML=s=>esc(s).replace(/_____/g,'<span class="blank">____</span>');
+const pg=p=>p?`<span class="pref">Guide p. ${p}</span>`:'';
+function unitDeck(u){
+  const d=[];
+  u.cards.forEach((c,i)=>d.push({id:`${u.n}-t${i}`,k:'term',f:c.f,b:c.b,l:c.l,p:c.p,w:c.weak}));
+  u.concept.forEach((c,i)=>d.push({id:`${u.n}-c${i}`,k:'concept',f:c.f,l:c.l,p:c.p}));
+  u.cloze.forEach((c,i)=>d.push({id:`${u.n}-z${i}`,k:'cloze',f:c.s,a:c.a,lead:c.lead,full:c.full,p:c.p}));
+  return d;
+}
+function unitQs(u){
+  const qs=[]; const terms=u.cards.filter(c=>!c.weak).map(c=>c.f);
+  const allTerms=D.flatMap(x=>x.cards.map(c=>c.f));
+  u.cards.forEach((c,i)=>{ if(!c.q) return;
+    let pool=terms.filter(t=>t!==c.f); if(pool.length<3) pool=pool.concat(pick(allTerms.filter(t=>t!==c.f&&!pool.includes(t)),3-pool.length));
+    qs.push({id:`${u.n}-q${i}`,u:u.n,k:'term',stem:c.q,lead:'Which term from the guide fills the blank?',a:c.f,opts:shuffle([c.f,...pick(pool,3)]),src:c.b,l:c.l,p:c.p});
+  });
+  u.cloze.forEach((c,i)=>qs.push({id:`${u.n}-z${i}`,u:u.n,k:'cloze',stem:c.s,lead:c.lead||'Fill in the blank:',a:c.a,opts:shuffle([c.a,...c.d]),src:c.full,p:c.p}));
+  return qs;
+}
+function unitStatus(u){
+  const deck=unitDeck(u); const known=deck.filter(c=>S.cards[c.id]&&S.cards[c.id].last===1).length;
+  const t=S.tests[u.n];
+  const seen=deck.some(c=>S.cards[c.id]);
+  return {rev:!!S.rev[u.n], drill:seen&&deck.length?Math.round(known/deck.length*100):null, test:t?t.best:null, deck:deck.length};
+}
+const cls=v=>v==null?'':v>=80?'on':v>=60?'mid':'low';
+
+/* ---------- views ---------- */
+function vHome(){
+  const all=D.map(unitStatus);
+  const rev=all.filter(s=>s.rev).length;
+  const deckN=all.reduce((a,s)=>a+s.deck,0);
+  const known=Object.values(S.cards).filter(r=>r.last===1).length;
+  const tests=Object.values(S.tests).map(t=>t.best); const avg=tests.length?Math.round(tests.reduce((a,b)=>a+b,0)/tests.length):null;
+  const lastMock=S.mocks.length?S.mocks[S.mocks.length-1]:null;
+  let plan='';
+  if(S.exam){
+    const days=Math.ceil((new Date(S.exam+'T09:00:00')-new Date())/864e5);
+    const left=30-rev;
+    plan=days>0?`<b>${days}</b> day${days===1?'':'s'} until your exam. ${left?`${left} unit${left===1?'':'s'} left to read: about <b>${Math.ceil(left/Math.max(days-1,1))}</b> a day leaves the last day for a mock exam.`:'Every unit has been read. Spend the time on mock exams and weak spots.'}`:days===0?'Your exam is today. Skim Numbers to know and your weak spots.':'Your exam date has passed. Set a new one if you are retesting.';
+  }
+  const row=u=>{const s=unitStatus(u);return `<a class="urow ${u.ia?'ia':''}" href="#unit-${u.n}-learn">
+      <span class="num">${u.n}</span>
+      <span><span class="ttl">${esc(u.t)}</span><br><span class="pg">Guide pp. ${u.ps}–${u.pe}</span></span>
+      <span class="marks"><span class="mk ${s.rev?'on':''}" title="Key points read">${s.rev?'Read':'Unread'}</span><span class="mk ${cls(s.drill)}" title="Flashcards you know">Cards ${s.drill==null?'–':s.drill+'%'}</span><span class="mk ${cls(s.test)}" title="Best unit test">${s.test==null?'Test –':'Test '+s.test+'%'}</span></span></a>`};
+  const studied=Object.keys(S.cards).length+Object.keys(S.qs).length+Object.keys(S.rev).length;
+  const stale=studied>0&&(!S.backupAt||Date.now()-S.backupAt>7*864e5);
+  const remind=stale?`<div class="note row" style="justify-content:space-between"><span>Your progress is saved in this browser. ${S.backupAt?'Your last backup was '+Math.floor((Date.now()-S.backupAt)/864e5)+' days ago.':'You haven’t made a backup yet.'} A backup file protects it if the browser data is cleared, and moves it to another computer.</span><button class="btn" id="bk">Download backup</button></div>`:'';
+  return remind+`<h1>${esc(curProfile().name)}’s exam prep</h1>
+  <p class="muted prose">Every unit has three steps: <b>Learn</b> the Key Point Review, <b>Drill</b> the flashcards, then <b>Test</b> yourself. All content comes word for word from your study guide, with page numbers so you can check any answer.</p>
+  <div class="stats">
+    <div class="stat"><b>${rev}/30</b><span>units read</span></div>
+    <div class="stat"><b>${known}/${deckN}</b><span>flashcards known</span></div>
+    <div class="stat"><b>${avg==null?'–':avg+'%'}</b><span>average best unit test</span></div>
+    <div class="stat"><b>${lastMock?lastMock.score+'%':'–'}</b><span>last mock exam</span></div>
+  </div>
+  <div class="panel row" style="margin-bottom:22px;justify-content:space-between">
+    <div><label for="exam" style="font-weight:700">Exam date</label> <input type="date" id="exam" value="${esc(S.exam)}"></div>
+    <div class="prose" style="flex:1;min-width:240px">${plan||'<span class="muted">Add your exam date to get a daily pace.</span>'}</div>
+  </div>
+  <div class="grid2">
+    <section><div class="sec-h"><h2>National content</h2><span class="chip">Units 1–23</span></div><div class="ulist">${D.filter(u=>!u.ia).map(row).join('')}</div></section>
+    <section><div class="sec-h"><h2>Iowa-specific content</h2><span class="chip ia">Units 24–30</span></div><div class="ulist">${D.filter(u=>u.ia).map(row).join('')}</div>
+      <div class="panel" style="margin-top:16px"><h3>Quick study</h3><p class="muted small">Iowa rules are full of numbers: board size, deadlines, dollar limits. Drill them in one place.</p>
+      <div class="row"><a class="btn pri" href="#numbers">Numbers to know</a><a class="btn" href="#mock">Iowa-only mock exam</a></div></div>
+    </section>
+  </div>`;
+}
+function afterHome(){const bk=$('#bk'); if(bk) bk.onclick=()=>{backupFile(); route();};const e=$('#exam'); if(e) e.onchange=()=>{S.exam=e.value; save(); route();};}
+
+function vUnit(n,tab){
+  const u=D.find(x=>x.n===n); if(!u) return vHome();
+  const t=tab||'learn';
+  const head=`<p class="small"><a href="#home">← All units</a></p>
+   <div class="sec-h"><h1>Unit ${u.n}: ${esc(u.t)}</h1><span class="chip ${u.ia?'ia':''}">${u.ia?'Iowa-specific':'National'} · Guide pp. ${u.ps}–${u.pe}</span></div>
+   <nav class="tabs">${['learn','drill','test'].map(x=>`<a href="#unit-${n}-${x}" class="${x===t?'on':''}">${x[0].toUpperCase()+x.slice(1)}</a>`).join('')}</nav>`;
+  if(t==='learn') return head+learnHTML(u);
+  if(t==='drill') return head+'<div id="drill"></div>';
+  return head+'<div id="test"></div>';
+}
+function learnHTML(u){
+  const read=!!S.rev[u.n];
+  return `<div class="grid2" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)">
+   <section>
+    <div class="sec-h"><h2>Key Point Review</h2>${pg(u.pe)}</div>
+    <div class="prose review">${blocksHTML(u.rev)}</div>
+    <div class="row" style="margin-top:18px"><button class="btn ${read?'good':'pri'}" id="markread">${read?'Marked as read ✓':'Mark as read'}</button><a class="btn" href="#unit-${u.n}-drill">Next: Drill →</a></div>
+   </section>
+   <aside>
+    ${u.tips.length?`<h3>In practice (${u.tips.length})</h3>`+u.tips.map(t=>`<div class="tip"><div>${esc(t.x)}</div><div class="pref">Guide p. ${t.p}</div></div>`).join(''):''}
+    <h3 style="margin-top:18px">Full notes by section</h3>
+    <p class="muted small">The complete text from the guide, for when the summary isn't enough.</p>
+    ${u.secs.filter(s=>s.b.length).map((s,i)=>`<details class="sec" id="s-${u.n}-${i}"><summary><span>${esc(s.h)}</span>${pg(s.p)}</summary><div class="prose">${blocksHTML(s.b)}</div></details>`).join('')}
+   </aside></div>`;
+}
+function afterLearn(u){const b=$('#markread'); if(b) b.onclick=()=>{S.rev[u.n]=!S.rev[u.n]; save(); route();};}
+
+/* drill */
+let DR=null;
+function startDrill(deck,el,title,onEnd){
+  DR={deck,i:0,flip:false,got:0,miss:0,el,title,onEnd}; drawDrill();
+}
+function drawDrill(){
+  const d=DR; if(!d) return;
+  if(!d.deck.length){d.el.innerHTML='<p class="muted">No cards here yet.</p>';return;}
+  if(d.i>=d.deck.length){
+    d.el.innerHTML=`<div class="panel"><h2>Round done</h2><p>You knew <span class="ok-t">${d.got}</span> and missed <span class="no-t">${d.miss}</span> of ${d.deck.length} cards.</p><div class="row"><button class="btn pri" id="again">Drill the ${d.miss} missed</button><button class="btn" id="restart">Start over (shuffled)</button>${d.onEnd||''}</div></div>`;
+    const missed=d.deck.filter(c=>S.cards[c.id]&&S.cards[c.id].last===0);
+    $('#again').disabled=!missed.length; $('#again').onclick=()=>startDrill(shuffle(missed),d.el,d.title);
+    $('#restart').onclick=()=>startDrill(shuffle(d.deck),d.el,d.title); return;
+  }
+  const c=d.deck[d.i];
+  let front,back;
+  if(c.k==='term'){front=`<div class="lbl">Term</div><div class="term">${esc(c.f)}</div>`; back=`<div class="lbl">${c.w?'Where the guide mentions it':'From the guide'}</div><div class="face">${esc(c.b)}${listHTML(c.l)}</div>`;}
+  else if(c.k==='concept'){front=`<div class="lbl">Complete the list</div><div class="face" style="font-size:1.4rem;font-weight:600">${esc(c.f)} …</div>`; back=`<div class="lbl">${esc(c.f)}</div><div class="face prose">${listHTML(c.l)}</div>`;}
+  else {front=`<div class="lbl">${c.lead?esc(c.lead):'Fill in the blank'}</div><div class="face">${blankHTML(c.f)}</div>`; back=`<div class="lbl">Answer: <span class="ans">${esc(c.a)}</span></div><div class="face">${esc(c.full)}</div>`;}
+  d.el.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="muted">${esc(d.title||'')} Card ${d.i+1} of ${d.deck.length}</span><span class="small"><span class="ok-t">${d.got} known</span> · <span class="no-t">${d.miss} missed</span></span></div>
+   <div class="bar" style="margin-bottom:14px"><i style="width:${d.i/d.deck.length*100}%"></i></div>
+   <div class="card" id="card" tabindex="0" role="button" aria-label="Flip card">${d.flip?back:front}<div class="pref">${d.flip?'Guide p. '+(c.p||''):'Tap or press Space to flip'}</div></div>
+   <div class="row" style="margin-top:14px;justify-content:center">${d.flip?`<button class="btn bad" id="miss">Missed it</button><button class="btn good" id="got">Knew it</button>`:`<button class="btn pri" id="flip">Show answer</button>`}<button class="btn" id="skip">Skip</button></div>
+   <p class="muted small" style="text-align:center">Keys: Space flips · 1 missed · 2 knew it</p>`;
+  const flip=()=>{d.flip=!d.flip;drawDrill()};
+  $('#card').onclick=flip; const f=$('#flip'); if(f) f.onclick=flip;
+  const ans=ok=>{mark('cards',c.id,ok); ok?d.got++:d.miss++; d.i++; d.flip=false; drawDrill();};
+  if($('#got')){$('#got').onclick=()=>ans(true); $('#miss').onclick=()=>ans(false);}
+  $('#skip').onclick=()=>{d.i++;d.flip=false;drawDrill();};
+}
+document.addEventListener('keydown',e=>{
+  if(!DR||!document.getElementById('card')||e.target.tagName==='INPUT') return;
+  if(e.key===' '){e.preventDefault();DR.flip=!DR.flip;drawDrill();}
+  else if(DR.flip&&(e.key==='1'||e.key==='2')){const ok=e.key==='2';const c=DR.deck[DR.i];mark('cards',c.id,ok);ok?DR.got++:DR.miss++;DR.i++;DR.flip=false;drawDrill();}
+});
+
+/* quiz engine */
+let QZ=null;
+function startQuiz(qs,el,opts){QZ={qs,i:0,ans:[],el,opts:opts||{},t0:Date.now()}; drawQuiz();}
+function drawQuiz(){
+  const z=QZ; if(!z) return;
+  if(!z.qs.length){z.el.innerHTML='<p class="muted">This unit of the guide has no key-term list or numbers to quiz on. Use Learn and Drill for it, or take a mock exam.</p>';return;}
+  if(z.i>=z.qs.length) return endQuiz();
+  const q=z.qs[z.i]; const a=z.ans[z.i];
+  z.el.innerHTML=`<div class="q">
+   <div class="row" style="justify-content:space-between"><span class="muted">${esc(z.opts.title||'')} Question ${z.i+1} of ${z.qs.length}</span>${z.opts.showUnit?`<span class="chip ${q.u>23?'ia':''}">Unit ${q.u}</span>`:''}</div>
+   <div class="bar" style="margin:10px 0 16px"><i style="width:${z.i/z.qs.length*100}%"></i></div>
+   <div class="muted small" style="font-weight:700">${esc(q.lead)}</div>
+   <div class="stem">${blankHTML(q.stem)}</div>
+   ${q.k==='term'&&q.l?`<div class="prose small muted">${listHTML(q.l)}</div>`:''}
+   <div class="choices">${q.opts.map((o,j)=>`<button class="choice ${a!=null?(o===q.a?'right':(a===o?'wrong':'')):''}" data-j="${j}" ${a!=null?'disabled':''}>${String.fromCharCode(65+j)}. ${esc(o)}</button>`).join('')}</div>
+   ${a!=null?`<div class="fb ${a===q.a?'ok':'no'}"><b class="${a===q.a?'ok-t':'no-t'}">${a===q.a?'Correct.':'Not quite. The answer is '+esc(q.a)+'.'}</b><div style="margin-top:6px">${esc(q.src)}</div><div class="pref">Guide p. ${q.p} · Unit ${q.u}</div></div>
+   <div class="row" style="margin-top:14px"><button class="btn pri" id="next">${z.i+1<z.qs.length?'Next question →':'See results'}</button></div>`:''}
+  </div>`;
+  z.el.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const o=q.opts[+b.dataset.j]; z.ans[z.i]=o; mark('qs',q.id,o===q.a); drawQuiz();});
+  const n=$('#next'); if(n){n.onclick=()=>{z.i++;drawQuiz();window.scrollTo({top:0})}; n.focus();}
+}
+function endQuiz(){
+  const z=QZ; const right=z.qs.filter((q,i)=>z.ans[i]===q.a).length; const score=Math.round(right/z.qs.length*100);
+  const mins=Math.round((Date.now()-z.t0)/60000);
+  if(z.opts.unit){const t=S.tests[z.opts.unit]||{best:0}; S.tests[z.opts.unit]={best:Math.max(t.best||0,score),last:score,t:Date.now()}; save();}
+  if(z.opts.mock){S.mocks.push({t:Date.now(),score,n:z.qs.length,scope:z.opts.scope}); S.mocks=S.mocks.slice(-30); save();}
+  let br='';
+  if(z.opts.mock){
+    const by={}; z.qs.forEach((q,i)=>{by[q.u]=by[q.u]||[0,0]; by[q.u][1]++; if(z.ans[i]===q.a) by[q.u][0]++;});
+    br=`<h3 style="margin-top:18px">By unit</h3><table class="br"><tr><th>Unit</th><th class="n">Right</th><th class="n">Score</th></tr>${Object.entries(by).sort((a,b)=>a[0]-b[0]).map(([u,[r,t]])=>`<tr><td><a href="#unit-${u}-learn">${u}. ${esc(D[u-1].t)}</a></td><td class="n">${r}/${t}</td><td class="n ${r/t>=.75?'ok-t':'no-t'}">${Math.round(r/t*100)}%</td></tr>`).join('')}</table>`;
+  }
+  const wrong=z.qs.map((q,i)=>[q,z.ans[i]]).filter(([q,a])=>a!==q.a);
+  z.el.innerHTML=`<div class="panel"><h2>${score}% <span class="muted" style="font-size:1rem">${right} of ${z.qs.length} right${mins?` · ${mins} min`:''}</span></h2>
+   <p class="muted">${score>=75?'Strong result. Keep the streak going on another unit.':'Review the misses below, then try again. Missed questions also show up in Weak spots.'}</p>
+   <div class="row"><button class="btn pri" id="retry">Try a new set</button>${z.opts.unit?`<a class="btn" href="#unit-${z.opts.unit}-learn">Back to Learn</a>`:''}<a class="btn" href="#weak">Weak spots</a></div>${br}
+   ${wrong.length?`<h3 style="margin-top:18px">Review your misses</h3><ul class="list-plain">${wrong.map(([q,a])=>`<li><div>${blankHTML(q.stem)}</div><div class="small"><span class="no-t">You: ${esc(a??'skipped')}</span> · <span class="ok-t">Answer: ${esc(q.a)}</span> · <span class="pref">Unit ${q.u}, p. ${q.p}</span></div></li>`).join('')}</ul>`:''}</div>`;
+  $('#retry').onclick=()=>z.opts.again&&z.opts.again();
+}
+
+function vMock(){
+  return `<h1>Mock exam</h1><p class="muted prose">A mixed set drawn from every unit you pick. Questions come straight from the guide: term definitions plus the numbers and deadlines from each Key Point Review. Every answer shows its page.</p>
+  <div class="panel row" style="margin:16px 0"><label for="scope" style="font-weight:700">Content</label><select id="scope"><option value="all">National + Iowa</option><option value="nat">National only (Units 1–23)</option><option value="ia">Iowa only (Units 24–30)</option></select>
+  <label for="len" style="font-weight:700">Questions</label><select id="len"><option>25</option><option selected>50</option><option>100</option></select>
+  <button class="btn pri" id="go">Start mock exam</button></div>
+  ${S.mocks.length?`<h3>Recent mock exams</h3><table class="br"><tr><th>Date</th><th>Content</th><th class="n">Questions</th><th class="n">Score</th></tr>${S.mocks.slice().reverse().slice(0,8).map(m=>`<tr><td>${new Date(m.t).toLocaleDateString()}</td><td>${({all:'National + Iowa',nat:'National',ia:'Iowa'})[m.scope]||''}</td><td class="n">${m.n}</td><td class="n">${m.score}%</td></tr>`).join('')}</table>`:''}
+  <div id="test" style="margin-top:16px"></div>`;
+}
+function runMock(scope,len){
+  const units=D.filter(u=>scope==='all'||(scope==='ia'?u.ia:!u.ia));
+  // spread questions across units evenly
+  const per=units.map(u=>shuffle(unitQs(u)));
+  const out=[]; let k=0; while(out.length<len&&per.some(p=>p.length)){const p=per[k%per.length]; if(p.length) out.push(p.pop()); k++;}
+  document.querySelector('.panel').classList.add('hide');
+  startQuiz(shuffle(out),$('#test'),{mock:true,scope,showUnit:true,again:()=>{route();}});
+}
+function vWeak(){
+  const allQ=D.flatMap(unitQs), allC=D.flatMap(unitDeck);
+  const wq=allQ.filter(q=>S.qs[q.id]&&S.qs[q.id].last===0);
+  const wc=allC.filter(c=>S.cards[c.id]&&S.cards[c.id].last===0);
+  const by={}; [...wq.map(q=>q.u),...wc.map(c=>+c.id.split('-')[0])].forEach(u=>by[u]=(by[u]||0)+1);
+  return `<h1>Weak spots</h1><p class="muted prose">Anything you got wrong the last time you saw it. Get it right and it drops off this list.</p>
+  <div class="stats"><div class="stat"><b>${wq.length}</b><span>questions to retry</span></div><div class="stat"><b>${wc.length}</b><span>flashcards to re-drill</span></div></div>
+  <div class="row" style="margin-bottom:16px"><button class="btn pri" id="wq" ${wq.length?'':'disabled'}>Retry missed questions</button><button class="btn" id="wc" ${wc.length?'':'disabled'}>Drill missed cards</button></div>
+  ${Object.keys(by).length?`<h3>Where they are</h3><table class="br"><tr><th>Unit</th><th class="n">Misses</th></tr>${Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([u,n])=>`<tr><td><a href="#unit-${u}-learn">${u}. ${esc(D[u-1].t)}</a></td><td class="n">${n}</td></tr>`).join('')}</table>`:'<p class="muted">Nothing here yet. Missed cards and questions will collect here as you study.</p>'}
+  <div id="work" style="margin-top:18px"></div>`;
+}
+function afterWeak(){
+  const allQ=D.flatMap(unitQs), allC=D.flatMap(unitDeck);
+  const b1=$('#wq'),b2=$('#wc');
+  b1.onclick=()=>{const wq=allQ.filter(q=>S.qs[q.id]&&S.qs[q.id].last===0); startQuiz(shuffle(wq).slice(0,40),$('#work'),{showUnit:true,title:'Weak spots.',again:()=>route()});};
+  b2.onclick=()=>{const wc=allC.filter(c=>S.cards[c.id]&&S.cards[c.id].last===0); startDrill(shuffle(wc),$('#work'),'Weak spots.');};
+}
+function vNumbers(){
+  return `<h1>Numbers to know</h1><p class="muted prose">Every Key Point Review statement with a number in it, plus the Iowa sections' days, dollar amounts and percentages. Answers are highlighted. Use Drill to quiz yourself on them.</p>
+  <div class="row" style="margin:12px 0 18px"><button class="btn pri" id="nd">Drill all numbers</button><button class="btn" id="ndia">Drill Iowa numbers only</button></div>
+  <div id="work"></div>
+  ${D.filter(u=>u.cloze.length).map(u=>`<section style="margin-bottom:20px"><div class="sec-h"><h3>Unit ${u.n}: ${esc(u.t)}</h3><span class="chip ${u.ia?'ia':''}">${u.ia?'Iowa':'National'}</span></div>
+   <ul class="list-plain prose">${u.cloze.map(c=>`<li>${esc(c.s).replace('_____','<mark><b>'+esc(c.a)+'</b></mark>')} <span class="pref">p. ${c.p}</span></li>`).join('')}</ul></section>`).join('')}`;
+}
+function afterNumbers(){
+  const mk=f=>D.filter(f).flatMap(u=>unitDeck(u).filter(c=>c.k==='cloze'));
+  $('#nd').onclick=()=>{startDrill(shuffle(mk(()=>true)),$('#work'),'Numbers.');$('#work').scrollIntoView();};
+  $('#ndia').onclick=()=>{startDrill(shuffle(mk(u=>u.ia)),$('#work'),'Iowa numbers.');$('#work').scrollIntoView();};
+}
+let IDX=null;
+function vSearch(){return `<h1>Search the guide</h1><p class="muted">Searches the full text of all 30 units.</p><input type="search" id="q" placeholder="Try: earnest money, joint tenancy, 640 acres" aria-label="Search the guide"><div id="hits" style="margin-top:14px"></div>`;}
+function afterSearch(){
+  if(!IDX){IDX=[];D.forEach(u=>{u.secs.forEach((s,i)=>IDX.push({u,i,h:s.h,p:s.p,x:s.b.map(b=>b.t==='p'?b.x:b.i.join(' • ')).join(' ')}));IDX.push({u,i:-1,h:'Key Point Review',p:u.pe,x:u.rev.map(b=>b.t==='p'?b.x:b.i.join(' • ')).join(' ')});});}
+  const inp=$('#q'); let t;
+  const run=()=>{const q=inp.value.trim(); const el=$('#hits'); if(q.length<3){el.innerHTML='';return;}
+    const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i');
+    const hits=IDX.filter(r=>re.test(r.h)||re.test(r.x)).slice(0,60);
+    el.innerHTML=`<p class="muted small">${hits.length>=60?'Showing the first 60 matches':hits.length+' match'+(hits.length===1?'':'es')}</p>`+hits.map(r=>{const m=r.x.search(re); const sn=m<0?r.x.slice(0,180):r.x.slice(Math.max(0,m-90),m+150);
+      return `<div class="hit"><a href="#unit-${r.u.n}-learn" data-u="${r.u.n}" data-i="${r.i}">${esc(r.h)}</a> <span class="chip ${r.u.ia?'ia':''}">Unit ${r.u.n}</span> <span class="pref">p. ${r.p}</span><div class="small">…${esc(sn).replace(new RegExp(re.source,'gi'),x=>'<mark>'+x+'</mark>')}…</div></div>`}).join('');
+    el.querySelectorAll('a[data-i]').forEach(a=>a.onclick=()=>{OPEN={u:+a.dataset.u,i:+a.dataset.i};});
+  };
+  inp.oninput=()=>{clearTimeout(t);t=setTimeout(run,200)}; inp.focus();
+}
+let OPEN=null;
+
+function vWelcome(){
+  return `<h1>Who’s studying?</h1>
+  <p class="muted prose">Each person gets their own profile, so their flashcards, scores and weak spots are kept separately. Profiles are saved in this browser. To use your progress on another computer, download a backup file and restore it there.</p>
+  ${P.list.length?`<div class="plist" style="margin:16px 0">${P.list.map(p=>`<div class="prow"><b>${esc(p.name)}</b><button class="btn pri" data-pick="${p.id}">Continue as ${esc(p.name)}</button></div>`).join('')}</div><h3>New profile</h3>`:''}
+  <form id="newp" class="row" style="margin:10px 0 24px"><label for="pname" class="hide">Your name</label><input type="text" id="pname" maxlength="40" placeholder="Your name" required><button class="btn pri" type="submit">Create profile</button></form>
+  <h3>Coming from another computer?</h3>
+  <p class="muted small">Restore a backup file to bring your progress here. It creates a profile with your saved progress.</p>
+  <label class="btn" for="restore0" style="display:inline-block">Restore from backup file</label><input type="file" id="restore0" accept=".json,application/json" class="hide">
+  <p id="rmsg" class="small"></p>`;
+}
+function readBackup(file,cb){
+  const r=new FileReader();
+  r.onload=()=>{try{const j=JSON.parse(r.result); if(j.app!=='iowa-re-exam-prep'||!j.progress) throw 0; cb(null,j);}catch(e){cb('That file isn’t an exam prep backup. Choose the .json file you downloaded from this site.');}};
+  r.onerror=()=>cb('The file couldn’t be read. Try choosing it again.');
+  r.readAsText(file);
+}
+function afterWelcome(){
+  document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{switchProfile(b.dataset.pick); location.hash='#home'; route();});
+  $('#newp').onsubmit=e=>{e.preventDefault(); const n=$('#pname').value.trim(); if(!n) return; createProfile(n); location.hash='#home'; route();};
+  $('#restore0').onchange=e=>{const f=e.target.files[0]; if(!f) return; readBackup(f,(err,j)=>{ if(err){$('#rmsg').innerHTML='<span class="no-t">'+esc(err)+'</span>';return;}
+    let name=j.profile||'Restored'; if(P.list.some(p=>p.name===name)) name+=' (restored)';
+    createProfile(name); S=Object.assign(BLANK(),j.progress); save(); location.hash='#home'; route();});};
+}
+function vAccount(){
+  const p=curProfile();
+  const others=P.list.filter(x=>x.id!==p.id);
+  return `<h1>Profile: ${esc(p.name)}</h1>
+  <p class="muted prose">Your progress is saved automatically in this browser as you study, so closing the tab or a browser crash won’t lose it. A backup file covers the rest: cleared browser data, a new computer, or a different browser.</p>
+  <section class="panel" style="margin:16px 0"><h2>Backup</h2>
+    <p class="muted small">${S.backupAt?'Last backup: '+new Date(S.backupAt).toLocaleString():'No backup made yet.'}</p>
+    <div class="row"><button class="btn pri" id="bk">Download backup file</button>
+    <label class="btn" for="restore1">Restore from backup file</label><input type="file" id="restore1" accept=".json,application/json" class="hide"></div>
+    <p class="muted small">Restoring replaces ${esc(p.name)}’s current progress with what’s in the file.</p><p id="rmsg" class="small"></p></section>
+  <section class="panel" style="margin:16px 0"><h2>Switch profile</h2>
+    <div class="plist" style="margin-top:10px">${others.map(x=>`<div class="prow"><b>${esc(x.name)}</b><button class="btn" data-pick="${x.id}">Switch to ${esc(x.name)}</button></div>`).join('')||'<p class="muted small">No other profiles in this browser.</p>'}</div>
+    <div class="row" style="margin-top:12px"><a class="btn" href="#profiles">Add a new profile</a></div></section>
+  <section class="danger" style="margin:16px 0"><h2>Reset exam prep</h2>
+    <p class="prose">This erases all of ${esc(p.name)}’s progress: units read, flashcards, test scores, mock exams and weak spots. It can’t be undone unless you have a backup file. Other profiles aren’t affected.</p>
+    <label for="cf" style="font-weight:700">Type <code>confirm</code> to enable the reset button</label>
+    <div class="row" style="margin-top:8px"><input type="text" id="cf" autocomplete="off" spellcheck="false" placeholder="confirm"><button class="btn bad" id="reset" disabled>Reset ${esc(p.name)}’s progress</button></div>
+    <p id="resetmsg" class="small"></p></section>`;
+}
+function afterAccount(){
+  $('#bk').onclick=()=>{backupFile(); route();};
+  document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{switchProfile(b.dataset.pick); location.hash='#home'; route();});
+  $('#restore1').onchange=e=>{const f=e.target.files[0]; if(!f) return; readBackup(f,(err,j)=>{ if(err){$('#rmsg').innerHTML='<span class="no-t">'+esc(err)+'</span>';return;}
+    S=Object.assign(BLANK(),j.progress); save(); route(); $('#rmsg').innerHTML='<span class="ok-t">Progress restored from the backup made '+esc(new Date(j.exported).toLocaleString())+'.</span>';});};
+  const cf=$('#cf'), rb=$('#reset');
+  cf.oninput=()=>{rb.disabled=cf.value.trim()!=='confirm';};
+  rb.onclick=()=>{ if(cf.value.trim()!=='confirm') return; S=BLANK(); save(); route(); $('#resetmsg').innerHTML='<span class="ok-t">Progress reset. You’re starting fresh.</span>';};
+}
+
+/* ---------- router ---------- */
+function route(){
+  const h=(location.hash||'#home').slice(1);
+  const el=$('#app'); DR=null; QZ=null;
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',h.startsWith(a.dataset.r)));
+  setSync();
+  if(!curProfile()||h==='profiles'){el.innerHTML=vWelcome(); afterWelcome(); window.scrollTo({top:0}); return;}
+  let m;
+  if(h==='account'){el.innerHTML=vAccount(); afterAccount();}
+  else if((m=h.match(/^unit-(\d+)(?:-(learn|drill|test))?$/))){
+    const n=+m[1], tab=m[2]||'learn', u=D.find(x=>x.n===n);
+    el.innerHTML=vUnit(n,tab);
+    if(u&&tab==='learn'){afterLearn(u); if(OPEN&&OPEN.u===n){const d=OPEN.i>=0?document.getElementById(`s-${n}-${OPEN.i}`):null; if(d){d.open=true;d.scrollIntoView();} OPEN=null;}}
+    if(u&&tab==='drill'){const deck=unitDeck(u); const order=[...deck.filter(c=>S.cards[c.id]&&S.cards[c.id].last===0),...shuffle(deck.filter(c=>!(S.cards[c.id]&&S.cards[c.id].last===0)))];
+      startDrill(order,$('#drill'),'',`<a class="btn" href="#unit-${n}-test">Next: Test →</a>`);}
+    if(u&&tab==='test'){const go=()=>{const qs=unitQs(u); startQuiz(pick(qs,Math.min(10,qs.length)),$('#test'),{unit:n,title:`Unit ${n} test.`,again:go});}; go();}
+  }
+  else if(h==='mock'){el.innerHTML=vMock(); $('#go').onclick=()=>runMock($('#scope').value,+$('#len').value);}
+  else if(h==='weak'){el.innerHTML=vWeak(); afterWeak();}
+  else if(h==='numbers'){el.innerHTML=vNumbers(); afterNumbers();}
+  else if(h==='search'){el.innerHTML=vSearch(); afterSearch();}
+  else {el.innerHTML=vHome(); afterHome();}
+  if(!OPEN) window.scrollTo({top:0});
+}
+window.addEventListener('hashchange',route);
+fetch('data.json').then(r=>r.json()).then(d=>{D=d;route();}).catch(()=>{$('#app').innerHTML='<p>The study content could not load. Reload the page to try again.</p>';});
+</script>
+</body>
+</html>
