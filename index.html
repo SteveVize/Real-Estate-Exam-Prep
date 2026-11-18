@@ -498,7 +498,7 @@ function fullTestsHTML(){
       <div class="row" style="margin-top:4px"><a class="btn pri" href="#full-${k}">${run?'Continue':'Start'}</a>${last&&!run?`<a class="btn" href="#full-${k}-results">Last results</a>`:''}</div></div>`;}).join('')}</div>`;
 }
 function vTests(){
-  return `<h1>Tests</h1><p class="muted prose">Two tests that use every question from your Exam Prep book. Answer everything, submit, and get your score. Every question you miss is explained, with a link to the part of your study notes that covers it.</p>
+  return `<h1>Tests</h1><p class="muted prose">Two tests that use every question from your Exam Prep book, to help you learn every question and answer. One question at a time: you see right away if you got it right, with the correct answer and an explanation. At the end you get your score and a list of your misses. Your place is saved, so you can stop and come back.</p>
   <div style="margin-top:16px">${fullTestsHTML()}</div>`;
 }
 function vFull(k){
@@ -508,34 +508,38 @@ function vFull(k){
 }
 function afterFull(k){ drawFull(k); }
 function drawFull(k){
+  // same layout as practice questions: answer, see right or wrong at once, then go on
   const f=FULL[k], run=S.full[k], el=$('#fullq'); if(!el||!run) return;
-  const n=run.ids.length, i=Math.min(run.i||0,n-1), q=BQID(run.ids[i]), a=run.ans[q.id], done=Object.keys(run.ans).length, last=i===n-1;
-  el.innerHTML=`<div class="q" style="max-width:780px">
-   <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-size:1.15rem">${f.t}</b><span class="muted">Question ${i+1} of ${n}</span></div>
-   <div class="bar" style="margin:10px 0 18px"><i style="width:${done/n*100}%"></i></div>
+  const n=run.ids.length, i=Math.min(run.i||0,n-1), q=BQID(run.ids[i]), a=run.ans[q.id], last=i===n-1;
+  const done=Object.keys(run.ans).length, right=run.ids.filter(id=>run.ans[id]!=null&&run.ans[id]===BQID(id).ai).length;
+  el.innerHTML=`<div class="q">
+   <div class="row" style="justify-content:space-between"><span class="muted">${f.t}. Question ${i+1} of ${n}</span><span class="chip ${q.ia?'ia':''}">${esc(q.gl)}</span></div>
+   <div class="bar" style="margin:10px 0 16px"><i style="width:${done/n*100}%"></i></div>
+   <div class="muted small" style="font-weight:700">${esc(q.lead)}</div>
    <div class="stem">${esc(q.stem)}</div>
-   <div class="choices">${q.opts.map((o,j)=>`<button class="choice ${a===j?'sel':''}" data-j="${j}" aria-pressed="${a===j}">${L(j)}. ${esc(o)}</button>`).join('')}</div>
-   <div class="row" style="margin-top:18px;justify-content:space-between">
+   <div class="choices">${q.opts.map((o,j)=>`<button class="choice ${a!=null?(j===q.ai?'right':(a===j?'wrong':'')):''}" data-j="${j}" ${a!=null?'disabled':''}>${L(j)}. ${esc(o)}</button>`).join('')}</div>
+   ${a!=null?`<div class="fb ${a===q.ai?'ok':'no'}"><b class="${a===q.ai?'ok-t':'no-t'}">${a===q.ai?'Correct.':'Not quite. The answer is '+L(q.ai)+'. '+esc(q.a).replace(/[.,]$/,'')+'.'}</b>${bookFb(q)}</div>`:''}
+   <div class="row" style="margin-top:14px;justify-content:space-between">
      <button class="btn" id="fprev" ${i===0?'disabled':''}>← Previous</button>
-     ${last?`<button class="btn pri" id="fsub">Submit test</button>`:`<button class="btn pri" id="fnext">Next →</button>`}</div>
+     ${a!=null?(last?`<button class="btn pri" id="fsub">See results</button>`:`<button class="btn pri" id="fnext">Next question →</button>`):''}</div>
    <div id="fconfirm"></div>
-   <p class="muted small" style="margin-top:22px">${done} of ${n} answered · your answers save as you go${last?'':` · <a href="#" id="fsubnow">submit now</a>`}</p>
+   <p class="muted small" style="margin-top:18px">${right} right out of ${done} answered so far · your place is saved${last?'':` · <a href="#" id="fsubnow">finish and see results</a>`}</p>
   </div>`;
   const go=x=>{run.i=x; save(); drawFull(k); window.scrollTo({top:0});};
-  el.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{run.ans[q.id]=+b.dataset.j; save(); drawFull(k);});
+  el.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const j=+b.dataset.j; run.ans[q.id]=j; mark('qs',q.id,j===q.ai); drawFull(k);});
   $('#fprev').onclick=()=>go(i-1);
-  if($('#fnext')) $('#fnext').onclick=()=>go(i+1);
+  if($('#fnext')){ $('#fnext').onclick=()=>go(i+1); $('#fnext').focus(); }
   const submit=()=>{const left=n-Object.keys(run.ans).length;
     if(!left) return gradeFull(k);
     const first=run.ids.findIndex(id=>run.ans[id]==null);
-    $('#fconfirm').innerHTML=`<div class="note" style="margin-top:16px"><b>${left} question${left===1?' is':'s are'} unanswered</b> and will be graded as wrong.<div class="row" style="margin-top:10px"><button class="btn" id="fjump">Go to question ${first+1}</button><button class="btn bad" id="fany">Submit anyway</button></div></div>`;
+    $('#fconfirm').innerHTML=`<div class="note" style="margin-top:16px"><b>${left} question${left===1?' is':'s are'} unanswered</b> and will be graded as wrong.<div class="row" style="margin-top:10px"><button class="btn" id="fjump">Go to question ${first+1}</button><button class="btn bad" id="fany">See results anyway</button></div></div>`;
     $('#fjump').onclick=()=>go(first); $('#fany').onclick=()=>gradeFull(k);};
-  if($('#fsub')) $('#fsub').onclick=submit;
+  if($('#fsub')){ $('#fsub').onclick=submit; $('#fsub').focus(); }
   if($('#fsubnow')) $('#fsubnow').onclick=e=>{e.preventDefault(); submit();};
 }
 function gradeFull(k){
   const run=S.full[k], qs=run.ids.map(BQID);
-  let right=0; qs.forEach(q=>{const a=run.ans[q.id]; if(a!=null) mark('qs',q.id,a===q.ai); if(a===q.ai) right++;});
+  let right=0; qs.forEach(q=>{if(run.ans[q.id]===q.ai) right++;});
   const res={k,t:Date.now(),n:qs.length,answered:Object.keys(run.ans).length,right,score:Math.round(right/qs.length*100),mins:Math.round((Date.now()-run.t0)/60000),ids:run.ids,ans:run.ans};
   // keep full answer detail only for the latest attempt of each test
   S.fullHist=S.fullHist.map(h=>h.k===k?{k:h.k,t:h.t,n:h.n,answered:h.answered,right:h.right,score:h.score,mins:h.mins}:h).concat(res).slice(-20);
