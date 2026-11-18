@@ -31,6 +31,8 @@ Two other notes:
 ## Running it
 It's a static site (`index.html` + `data.json` + `questions.json`) served by GitHub Pages. No build step and no server.
 
+- **Answer key**: the same four tests (Iowa, National 1, 2, 3) with no answering. Each page shows one question and only its correct answer, in book order, so you can memorize them. Arrow keys move between pages and your place is saved.
+
 ## Question wording
 
 Every question and answer choice was proofread against the scanned book pages, so the wording matches the book word for word, including the book's own typos and punctuation. Two style differences only: answer letters are always capital A–E, and quotes are plain straight quotes.
