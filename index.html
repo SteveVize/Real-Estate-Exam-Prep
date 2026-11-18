@@ -371,7 +371,7 @@ function drawQuiz(){
    ${a!=null?`<div class="fb ${a===q.a?'ok':'no'}"><b class="${a===q.a?'ok-t':'no-t'}">${a===q.a?'Correct.':'Not quite. The answer is '+(q.book?L(q.ai)+'. ':'')+esc(q.a)+'.'}</b>${q.book?bookFb(q):`<div style="margin-top:6px">${esc(q.src)}</div><div class="pref">Guide p. ${q.p} · Unit ${q.u}</div>`}</div>
    <div class="row" style="margin-top:14px"><button class="btn pri" id="next">${z.i+1<z.qs.length?'Next question →':'See results'}</button></div>`:''}
   </div>`;
-  z.el.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const o=q.opts[+b.dataset.j]; z.ans[z.i]=o; mark('qs',q.id,o===q.a); drawQuiz();});
+  z.el.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{const o=q.opts[+b.dataset.j]; z.ans[z.i]=o; mark('qs',q.id,o===q.a); if(z.opts.onAnswer) z.opts.onAnswer(); drawQuiz();});
   const n=$('#next'); if(n){n.onclick=()=>{z.i++;drawQuiz();window.scrollTo({top:0})}; n.focus();}
 }
 function endQuiz(){
@@ -444,7 +444,7 @@ function vTopic(id){
   const units=t.units.map(n=>D.find(u=>u.n===n)).filter(Boolean);
   return `<p class="small"><a href="#book">← All exam questions</a></p>
   <div class="sec-h"><h1>${esc(t.t)}</h1><span class="chip ${t.ia?'ia':''}">${t.ia?'State portion':'National portion'} · ${qs.length} questions</span></div>
-  <div class="stats"><div class="stat"><b>${s.seen}/${s.n}</b><span>answered</span></div><div class="stat"><b>${s.pct==null?'–':s.pct+'%'}</b><span>right the last time</span></div><div class="stat"><b>${miss.length}</b><span>missed</span></div></div>
+  <div class="stats"><div class="stat"><b id="ts-seen">${s.seen}/${s.n}</b><span>answered</span></div><div class="stat"><b id="ts-pct">${s.pct==null?'–':s.pct+'%'}</b><span>right the last time</span></div><div class="stat"><b id="ts-miss">${miss.length}</b><span>missed</span></div></div>
   <div class="row" style="margin-bottom:18px"><button class="btn pri" id="t20">Practice 20 (unseen first)</button><button class="btn" id="tall">All ${qs.length}, shuffled</button><button class="btn" id="tmiss" ${miss.length?'':'disabled'}>Retry ${miss.length} missed</button></div>
   <div id="test"></div>
   <div id="topicinfo">
@@ -455,7 +455,11 @@ function vTopic(id){
 }
 function afterTopic(id){
   const qs=topicQs(id);
-  const go=(list,title)=>{$('#topicinfo').classList.add('hide'); startQuiz(list,$('#test'),{showUnit:false,title,again:()=>route()}); window.scrollTo({top:0});};
+  // keep the counts at the top in step with each answer
+  const refresh=()=>{const s=qStat(qs), miss=qs.filter(q=>S.qs[q.id]&&S.qs[q.id].last===0).length;
+    $('#ts-seen').textContent=`${s.seen}/${s.n}`; $('#ts-pct').textContent=s.pct==null?'–':s.pct+'%'; $('#ts-miss').textContent=miss;
+    const r=$('#tmiss'); r.textContent=`Retry ${miss} missed`; r.disabled=!miss;};
+  const go=(list,title)=>{$('#topicinfo').classList.add('hide'); startQuiz(list,$('#test'),{showUnit:false,title,again:()=>route(),onAnswer:refresh}); window.scrollTo({top:0});};
   const fresh=q=>!S.qs[q.id]?0:S.qs[q.id].last===0?1:2;
   $('#t20').onclick=()=>go(shuffle(qs).sort((a,b)=>fresh(a)-fresh(b)).slice(0,20),`${TOP(id).t}.`);
   $('#tall').onclick=()=>go(shuffle(qs),`${TOP(id).t}.`);
