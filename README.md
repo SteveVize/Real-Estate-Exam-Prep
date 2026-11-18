@@ -10,6 +10,7 @@ A study site for retaking the Iowa real estate license exam. It's built from two
 - **Learn**: each unit's Key Point Review, the guide's "In Practice" tips, and the full section text
 - **Drill**: flashcards for key terms, review lists, and fill-in-the-blank numbers
 - **Test**: 10 exam questions from the book section that covers the unit. Units with no matching book section (1, 5, 17, 23) have no test.
+- **Full tests**: two graded tests that use every question. The **Iowa test** has all 70 Iowa License Law questions, and the **National test** has all 465 national questions. Nothing is marked right or wrong until you submit. You can go back, change answers and skip questions, and your place is saved so you can finish later. The results show your score, a breakdown by section, and every question you missed with the right answer and book page.
 - **Mock exam**: 25, 50, 100 or a full 120 book questions. The full exam has 40 Iowa and 80 national questions, weighted like the content outline on page 4 of the book.
 - **Weak spots**, **Numbers to know**, **Search** (the guide and every exam question)
 
