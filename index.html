@@ -503,33 +503,35 @@ function vTests(){
 }
 function vFull(k){
   const f=FULL[k];
-  if(!S.full[k]){S.full[k]={ids:shuffle(f.qs()).map(q=>q.id),ans:{},t0:Date.now()}; save();}
-  const run=S.full[k], n=run.ids.length;
-  const qHTML=(id,i)=>{const q=BQID(id), a=run.ans[id];
-    return `<li class="tq" id="tq-${i}"><div class="stem"><b>${i+1}.</b> ${esc(q.stem)}</div><div class="choices">${q.opts.map((o,j)=>`<button class="choice ${a===j?'sel':''}" data-q="${id}" data-j="${j}" aria-pressed="${a===j}">${L(j)}. ${esc(o)}</button>`).join('')}</div></li>`;};
-  return `<p class="small"><a href="#tests">← Tests</a></p>
-  <h1>${f.t}</h1><p class="muted">${n} questions: ${f.sub}. Your answers save as you go.</p>
-  <div class="tbar"><span id="tcount"></span><div class="bar" style="flex:1;min-width:120px"><i id="tprog"></i></div><button class="btn pri" id="tsub">Submit test</button></div>
-  <ol class="tlist">${run.ids.map(qHTML).join('')}</ol>
-  <div class="panel" style="margin-top:20px"><div id="tconfirm"></div><div class="row" style="justify-content:space-between"><button class="btn pri" id="tsub2">Submit test</button><button class="btn" id="treset">Start over</button></div></div>`;
+  if(!S.full[k]){S.full[k]={ids:shuffle(f.qs()).map(q=>q.id),ans:{},i:0,t0:Date.now()}; save();}
+  return `<p class="small"><a href="#tests">← Tests</a></p><div id="fullq"></div>`;
 }
-function afterFull(k){
-  const run=S.full[k], n=run.ids.length;
-  const count=()=>{const d=Object.keys(run.ans).length; $('#tcount').textContent=`${d} of ${n} answered`; $('#tprog').style.width=(d/n*100)+'%';};
-  count();
-  document.querySelector('.tlist').addEventListener('click',e=>{const b=e.target.closest('.choice'); if(!b) return;
-    const id=b.dataset.q, j=+b.dataset.j; run.ans[id]=j; save();
-    b.parentElement.querySelectorAll('.choice').forEach(x=>{const on=+x.dataset.j===j; x.classList.toggle('sel',on); x.setAttribute('aria-pressed',on);});
-    count();});
+function afterFull(k){ drawFull(k); }
+function drawFull(k){
+  const f=FULL[k], run=S.full[k], el=$('#fullq'); if(!el||!run) return;
+  const n=run.ids.length, i=Math.min(run.i||0,n-1), q=BQID(run.ids[i]), a=run.ans[q.id], done=Object.keys(run.ans).length, last=i===n-1;
+  el.innerHTML=`<div class="q" style="max-width:780px">
+   <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-size:1.15rem">${f.t}</b><span class="muted">Question ${i+1} of ${n}</span></div>
+   <div class="bar" style="margin:10px 0 18px"><i style="width:${done/n*100}%"></i></div>
+   <div class="stem">${esc(q.stem)}</div>
+   <div class="choices">${q.opts.map((o,j)=>`<button class="choice ${a===j?'sel':''}" data-j="${j}" aria-pressed="${a===j}">${L(j)}. ${esc(o)}</button>`).join('')}</div>
+   <div class="row" style="margin-top:18px;justify-content:space-between">
+     <button class="btn" id="fprev" ${i===0?'disabled':''}>← Previous</button>
+     ${last?`<button class="btn pri" id="fsub">Submit test</button>`:`<button class="btn pri" id="fnext">Next →</button>`}</div>
+   <div id="fconfirm"></div>
+   <p class="muted small" style="margin-top:22px">${done} of ${n} answered · your answers save as you go${last?'':` · <a href="#" id="fsubnow">submit now</a>`}</p>
+  </div>`;
+  const go=x=>{run.i=x; save(); drawFull(k); window.scrollTo({top:0});};
+  el.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{run.ans[q.id]=+b.dataset.j; save(); drawFull(k);});
+  $('#fprev').onclick=()=>go(i-1);
+  if($('#fnext')) $('#fnext').onclick=()=>go(i+1);
   const submit=()=>{const left=n-Object.keys(run.ans).length;
     if(!left) return gradeFull(k);
     const first=run.ids.findIndex(id=>run.ans[id]==null);
-    $('#tconfirm').innerHTML=`<div class="note" style="margin-bottom:12px"><b>${left} question${left===1?' is':'s are'} unanswered</b> and will be graded as wrong. <a href="#" id="tjump">Go to question ${first+1}</a> or <a href="#" id="tanyway">submit anyway</a>.</div>`;
-    $('#tconfirm').scrollIntoView({block:'center'});
-    $('#tjump').onclick=e=>{e.preventDefault(); document.getElementById('tq-'+first).scrollIntoView({block:'center'});};
-    $('#tanyway').onclick=e=>{e.preventDefault(); gradeFull(k);};};
-  $('#tsub').onclick=submit; $('#tsub2').onclick=submit;
-  $('#treset').onclick=()=>{ if($('#treset').dataset.sure){delete S.full[k]; save(); route(); window.scrollTo({top:0});} else {$('#treset').dataset.sure=1; $('#treset').textContent='Click again to clear your answers';} };
+    $('#fconfirm').innerHTML=`<div class="note" style="margin-top:16px"><b>${left} question${left===1?' is':'s are'} unanswered</b> and will be graded as wrong.<div class="row" style="margin-top:10px"><button class="btn" id="fjump">Go to question ${first+1}</button><button class="btn bad" id="fany">Submit anyway</button></div></div>`;
+    $('#fjump').onclick=()=>go(first); $('#fany').onclick=()=>gradeFull(k);};
+  if($('#fsub')) $('#fsub').onclick=submit;
+  if($('#fsubnow')) $('#fsubnow').onclick=e=>{e.preventDefault(); submit();};
 }
 function gradeFull(k){
   const run=S.full[k], qs=run.ids.map(BQID);
