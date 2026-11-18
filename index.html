@@ -154,6 +154,7 @@ table.br td.n{text-align:right;font-variant-numeric:tabular-nums}
   <nav class="nav" id="nav">
     <a href="#home" data-r="home">Units</a>
     <a href="#tests" data-r="tests">Tests</a>
+    <a href="#key" data-r="key">Answer key</a>
     <a href="#weak" data-r="weak">Weak spots</a>
     <a href="#numbers" data-r="numbers">Numbers to know</a>
     <a href="#search" data-r="search">Search</a>
@@ -170,7 +171,7 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(M
 const pick=(a,n)=>shuffle(a).slice(0,n);
 
 /* ---------- profiles + progress (saved in this browser) ---------- */
-const BLANK=()=>({rev:{},cards:{},qs:{},tests:{},mocks:[],exam:'',backupAt:0,full:{},fullHist:[]});
+const BLANK=()=>({rev:{},cards:{},qs:{},tests:{},mocks:[],exam:'',backupAt:0,full:{},fullHist:[],key:{}});
 const PK='iare-profiles-v1';
 let P={list:[],cur:null};
 let S=BLANK();
@@ -452,6 +453,37 @@ function drawFull(k){
   if($('#fsub')){ $('#fsub').onclick=submit; $('#fsub').focus(); }
   if($('#fsubnow')) $('#fsubnow').onclick=e=>{e.preventDefault(); submit();};
 }
+/* ---------- answer key: same 4 tests, question + correct answer only, page by page, in book order ---------- */
+function vKeys(){
+  return `<h1>Answer key</h1><p class="muted prose">The same four tests, but with no answering: each page shows one question from your Exam Prep book and its correct answer only, in book order. Use it to memorize the questions and answers. Your place is saved.</p>
+  <div style="margin-top:16px"><div class="fulltests">${Object.entries(FULL).map(([k,f])=>{const n=f.qs().length, i=S.key[k]||0;
+    return `<div class="ft ${k==='ia'?'ia':''}"><div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-size:1.2rem">${f.t}</b><span class="chip ${k==='ia'?'ia':''}">${n} questions</span></div>
+      <span class="muted small">${f.sub}</span>
+      <span class="small">${i>0?`<b>Your place:</b> question ${i+1} of ${n}`:'<span class="muted">Not started</span>'}</span>
+      <div class="row" style="margin-top:4px"><a class="btn pri" href="#key-${k}">${i>0?'Continue':'Start'}</a>${i>0?`<button class="btn" data-restart="${k}">Start over</button>`:''}</div></div>`;}).join('')}</div></div>`;
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-restart]'); if(!b) return; S.key[b.dataset.restart]=0; save(); location.hash='#key-'+b.dataset.restart;});
+function drawKey(k){
+  const f=FULL[k], el=$('#keyq'); if(!el) return;
+  const qs=f.qs(), n=qs.length, i=Math.min(S.key[k]||0,n-1), q=qs[i];
+  el.innerHTML=`<div class="q">
+   <div class="row" style="justify-content:space-between"><span class="muted">${f.t} answer key. Question ${i+1} of ${n}</span><span class="chip ${q.ia?'ia':''}">${esc(q.gl)}</span></div>
+   <div class="bar" style="margin:10px 0 16px"><i style="width:${(i+1)/n*100}%"></i></div>
+   <div class="muted small" style="font-weight:700">${esc(q.lead)}</div>
+   <div class="stem">${esc(q.stem)}</div>
+   <div class="choices"><div class="choice right" style="cursor:default">${L(q.ai)}. ${esc(q.a)}</div></div>
+   <p class="muted small" style="margin-top:6px">${esc(q.ref)}</p>
+   <div class="row" style="margin-top:14px;justify-content:space-between">
+     <button class="btn" id="kprev" ${i===0?'disabled':''}>← Previous</button>
+     ${i<n-1?`<button class="btn pri" id="knext">Next question →</button>`:`<a class="btn pri" href="#key">Done: back to Answer key</a>`}</div>
+   <p class="muted small" style="margin-top:18px">Tip: use the ← and → arrow keys to move · your place is saved</p>
+  </div>`;
+  const go=x=>{S.key[k]=x; save(); drawKey(k); window.scrollTo({top:0});};
+  $('#kprev').onclick=()=>go(i-1);
+  if($('#knext')){ $('#knext').onclick=()=>go(i+1); $('#knext').focus(); }
+  document.onkeydown=e=>{ if(!location.hash.startsWith('#key-')||e.target.matches('input,textarea')) return;
+    if(e.key==='ArrowRight'&&i<n-1) go(i+1); else if(e.key==='ArrowLeft'&&i>0) go(i-1); };
+}
 function gradeFull(k){
   const run=S.full[k], qs=run.ids.map(BQID);
   let right=0; qs.forEach(q=>{if(run.ans[q.id]===q.ai) right++;});
@@ -618,6 +650,8 @@ function route(){
     }
   }
   else if(h==='tests'){el.innerHTML=vTests();}
+  else if(h==='key'){el.innerHTML=vKeys();}
+  else if((m=h.match(/^key-(ia|n1|n2|n3)$/))){el.innerHTML=`<p class="small"><a href="#key">← Answer key</a></p><div id="keyq"></div>`; drawKey(m[1]);}
   else if((m=h.match(/^full-(ia|n1|n2|n3)$/))){el.innerHTML=vFull(m[1]); afterFull(m[1]);}
   else if((m=h.match(/^full-(ia|n1|n2|n3)-results$/))){el.innerHTML=vFullResults(m[1]);}
   else if(h==='weak'){el.innerHTML=vWeak(); afterWeak();}
