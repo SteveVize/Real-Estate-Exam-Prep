@@ -2,15 +2,15 @@
 
 A study site for retaking the Iowa real estate license exam. It's built from two sources:
 
-- **My study guide** (679 pages, 30 units). Every card, recall question and summary is quoted from the guide with its page number.
-- **The Exam Prep book** (Iowa Association of REALTORS®). All 535 practice questions are copied word for word, with the book's answer key and page numbers. These are the closest match to the wording of the real test, so the site uses them first.
+- **My study guide** (679 pages, 30 units): the study material. Every card and summary is quoted from the guide with its page number.
+- **The Exam Prep book** (Iowa Association of REALTORS®): every practice question on the site. All 535 are copied word for word, with the book's answer key and page numbers. The site has no other questions.
 
 ## What's in it
 - **Exam questions**: every question from the Exam Prep book, sorted into the book's sections: Iowa License Law, Federal Laws, Agency, Contracts, Financing, Valuation, Property Ownership, Land Use and Real Estate Math. Practice each Speed and Miscellaneous set in the book's order, practice 20 at a time (unseen first), or retry the ones you missed. Math answers show the work.
 - **Learn**: each unit's Key Point Review, the guide's "In Practice" tips, and the full section text
 - **Drill**: flashcards for key terms, review lists, and fill-in-the-blank numbers
-- **Test**: 10 exam questions from the book section that covers the unit, with the guide recall test one click away
-- **Mock exam**: 25, 50, 100 or a full 120 questions. With book questions, the full exam has 40 Iowa and 80 national questions, weighted like the content outline on page 4 of the book.
+- **Test**: 10 exam questions from the book section that covers the unit. Units with no matching book section (1, 5, 17, 23) have no test.
+- **Mock exam**: 25, 50, 100 or a full 120 book questions. The full exam has 40 Iowa and 80 national questions, weighted like the content outline on page 4 of the book.
 - **Weak spots**, **Numbers to know**, **Search** (the guide and every exam question)
 
 ## Answer key notes
