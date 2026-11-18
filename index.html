@@ -209,16 +209,6 @@ function unitDeck(u){
   u.cloze.forEach((c,i)=>d.push({id:`${u.n}-z${i}`,k:'cloze',f:c.s,a:c.a,lead:c.lead,full:c.full,p:c.p}));
   return d;
 }
-function unitQs(u){
-  const qs=[]; const terms=u.cards.filter(c=>!c.weak).map(c=>c.f);
-  const allTerms=D.flatMap(x=>x.cards.map(c=>c.f));
-  u.cards.forEach((c,i)=>{ if(!c.q) return;
-    let pool=terms.filter(t=>t!==c.f); if(pool.length<3) pool=pool.concat(pick(allTerms.filter(t=>t!==c.f&&!pool.includes(t)),3-pool.length));
-    qs.push({id:`${u.n}-q${i}`,u:u.n,k:'term',stem:c.q,lead:'Which term from the guide fills the blank?',a:c.f,opts:shuffle([c.f,...pick(pool,3)]),src:c.b,l:c.l,p:c.p});
-  });
-  u.cloze.forEach((c,i)=>qs.push({id:`${u.n}-z${i}`,u:u.n,k:'cloze',stem:c.s,lead:c.lead||'Fill in the blank:',a:c.a,opts:shuffle([c.a,...c.d]),src:c.full,p:c.p}));
-  return qs;
-}
 function unitStatus(u){
   const deck=unitDeck(u); const known=deck.filter(c=>S.cards[c.id]&&S.cards[c.id].last===1).length;
   const t=S.tests[u.n];
@@ -259,7 +249,7 @@ function vHome(){
   const deckN=all.reduce((a,s)=>a+s.deck,0);
   const known=Object.values(S.cards).filter(r=>r.last===1).length;
   const tests=Object.values(S.tests).map(t=>t.best); const avg=tests.length?Math.round(tests.reduce((a,b)=>a+b,0)/tests.length):null;
-  const lastMock=S.mocks.length?S.mocks[S.mocks.length-1]:null;
+  const bm=S.mocks.filter(m=>m.src==='book'); const lastMock=bm.length?bm[bm.length-1]:null;
   let plan='';
   if(S.exam){
     const days=Math.ceil((new Date(S.exam+'T09:00:00')-new Date())/864e5);
@@ -406,34 +396,25 @@ function endQuiz(){
 }
 
 function vMock(){
-  return `<h1>Mock exam</h1><p class="muted prose">The real exam is 120 questions in 120 minutes: 40 on Iowa law and 80 national (book p. 4). <b>Exam Prep book</b> questions are the closest match to the real test, so they're the default. The full exam follows the book's outline: 40 Iowa License Law questions, then the national topics in the same proportions as the outline. Questions you haven't seen or have missed are picked first.</p>
+  return `<h1>Mock exam</h1><p class="muted prose">The real exam is 120 questions in 120 minutes: 40 on Iowa law and 80 national (book p. 4). Every question comes from your <b>Exam Prep</b> book. The full exam follows the book's outline: 40 Iowa License Law questions, then the national topics in the same proportions as the outline. Questions you haven't seen or have missed are picked first.</p>
   <div class="panel" style="margin:16px 0"><div class="row">
-  <label for="src" style="font-weight:700">Questions from</label><select id="src"><option value="book">Exam Prep book (recommended)</option><option value="guide">Study guide recall</option></select>
   <label for="scope" style="font-weight:700">Content</label><select id="scope"><option value="all">National + Iowa</option><option value="nat">National only</option><option value="ia">Iowa only</option></select>
   <label for="len" style="font-weight:700">Questions</label><select id="len"><option>25</option><option selected>50</option><option>100</option><option value="120">120 (full exam)</option></select>
   <button class="btn pri" id="go">Start mock exam</button></div>
   <p class="muted small" id="mockhint" style="margin:10px 0 0"></p></div>
-  ${S.mocks.length?`<h3>Recent mock exams</h3><table class="br"><tr><th>Date</th><th>Questions from</th><th>Content</th><th class="n">Questions</th><th class="n">Score</th></tr>${S.mocks.slice().reverse().slice(0,8).map(m=>`<tr><td>${new Date(m.t).toLocaleDateString()}</td><td>${m.src==='book'?'Exam Prep book':'Study guide'}</td><td>${({all:'National + Iowa',nat:'National',ia:'Iowa'})[m.scope]||''}</td><td class="n">${m.n}</td><td class="n">${m.score}%</td></tr>`).join('')}</table>`:''}
+  ${S.mocks.some(m=>m.src==='book')?`<h3>Recent mock exams</h3><table class="br"><tr><th>Date</th><th>Content</th><th class="n">Questions</th><th class="n">Score</th></tr>${S.mocks.filter(m=>m.src==='book').reverse().slice(0,8).map(m=>`<tr><td>${new Date(m.t).toLocaleDateString()}</td><td>${({all:'National + Iowa',nat:'National',ia:'Iowa'})[m.scope]||''}</td><td class="n">${m.n}</td><td class="n">${m.score}%</td></tr>`).join('')}</table>`:''}
   <div id="test" style="margin-top:16px"></div>`;
 }
 function afterMock(){
-  const hint=()=>{const src=$('#src').value, sc=$('#scope').value;
-    $('#mockhint').textContent=src==='book'?(sc==='ia'?`Iowa only uses the ${topicQs('ll').length} Iowa License Law questions.`:sc==='nat'?'National only uses the 8 national topics, weighted like the exam outline.':'A 120-question exam matches the real one: 40 Iowa + 80 national.'):'Study guide recall questions check the guide’s own wording: key terms and the numbers from each Key Point Review.';};
-  ['src','scope'].forEach(id=>$('#'+id).onchange=hint); hint();
-  $('#go').onclick=()=>runMock($('#scope').value,+$('#len').value,$('#src').value);
+  const hint=()=>{const sc=$('#scope').value;
+    $('#mockhint').textContent=sc==='ia'?`Iowa only uses the ${topicQs('ll').length} Iowa License Law questions.`:sc==='nat'?'National only uses the 8 national topics, weighted like the exam outline.':'A 120-question exam matches the real one: 40 Iowa + 80 national.';};
+  $('#scope').onchange=hint; hint();
+  $('#go').onclick=()=>runMock($('#scope').value,+$('#len').value);
 }
-function runMock(scope,len,src){
-  let out;
-  if(src==='book') out=bookMock(scope,len);
-  else{
-    const units=D.filter(u=>scope==='all'||(scope==='ia'?u.ia:!u.ia));
-    // spread questions across units evenly
-    const per=units.map(u=>shuffle(unitQs(u)));
-    out=[]; let k=0; while(out.length<len&&per.some(p=>p.length)){const p=per[k%per.length]; if(p.length) out.push(p.pop()); k++;}
-    out=shuffle(out);
-  }
+function runMock(scope,len){
+  const out=bookMock(scope,len);
   document.querySelector('.panel').classList.add('hide');
-  startQuiz(out,$('#test'),{mock:true,scope,src,showUnit:true,title:src==='book'?'Mock exam.':'',again:()=>{route();}});
+  startQuiz(out,$('#test'),{mock:true,scope,src:'book',showUnit:true,title:'Mock exam.',again:()=>{route();}});
 }
 function vBook(){
   const all=qStat(BQ);
@@ -482,24 +463,21 @@ function afterTopic(id){
   document.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>go(qs.filter(q=>q.set===b.dataset.set),`${b.dataset.set}.`));
 }
 function vWeak(){
-  const allQ=D.flatMap(unitQs).concat(BQ), allC=D.flatMap(unitDeck);
-  const wq=allQ.filter(q=>S.qs[q.id]&&S.qs[q.id].last===0);
-  const wb=wq.filter(q=>q.book);
+  const allC=D.flatMap(unitDeck);
+  const wb=BQ.filter(q=>S.qs[q.id]&&S.qs[q.id].last===0);
   const wc=allC.filter(c=>S.cards[c.id]&&S.cards[c.id].last===0);
-  const by={}; [...wq.map(q=>q.book?'b:'+q.g:'u:'+q.u),...wc.map(c=>'u:'+c.id.split('-')[0])].forEach(k=>by[k]=(by[k]||0)+1);
-  const lab=k=>k[0]==='b'?`<a href="#book-${k.slice(2)}">${esc(TOP(k.slice(2)).t)}</a> <span class="chip">Exam questions</span>`:`<a href="#unit-${k.slice(2)}-learn">${k.slice(2)}. ${esc(D[k.slice(2)-1].t)}</a>`;
+  const by={}; [...wb.map(q=>'b:'+q.g),...wc.map(c=>'u:'+c.id.split('-')[0])].forEach(k=>by[k]=(by[k]||0)+1);
+  const lab=k=>k[0]==='b'?`<a href="#book-${k.slice(2)}">${esc(TOP(k.slice(2)).t)}</a> <span class="chip">Exam questions</span>`:`<a href="#unit-${k.slice(2)}-learn">${k.slice(2)}. ${esc(D[k.slice(2)-1].t)}</a> <span class="chip">Flashcards</span>`;
   return `<h1>Weak spots</h1><p class="muted prose">Anything you got wrong the last time you saw it. Get it right and it drops off this list.</p>
-  <div class="stats"><div class="stat"><b>${wb.length}</b><span>exam questions to retry</span></div><div class="stat"><b>${wq.length-wb.length}</b><span>guide recall questions to retry</span></div><div class="stat"><b>${wc.length}</b><span>flashcards to re-drill</span></div></div>
-  <div class="row" style="margin-bottom:16px"><button class="btn pri" id="wb" ${wb.length?'':'disabled'}>Retry missed exam questions</button><button class="btn" id="wq" ${wq.length-wb.length?'':'disabled'}>Retry missed recall questions</button><button class="btn" id="wc" ${wc.length?'':'disabled'}>Drill missed cards</button></div>
+  <div class="stats"><div class="stat"><b>${wb.length}</b><span>exam questions to retry</span></div><div class="stat"><b>${wc.length}</b><span>flashcards to re-drill</span></div></div>
+  <div class="row" style="margin-bottom:16px"><button class="btn pri" id="wb" ${wb.length?'':'disabled'}>Retry missed exam questions</button><button class="btn" id="wc" ${wc.length?'':'disabled'}>Drill missed cards</button></div>
   ${Object.keys(by).length?`<h3>Where they are</h3><table class="br"><tr><th>Topic or unit</th><th class="n">Misses</th></tr>${Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<tr><td>${lab(k)}</td><td class="n">${n}</td></tr>`).join('')}</table>`:'<p class="muted">Nothing here yet. Missed cards and questions will collect here as you study.</p>'}
   <div id="work" style="margin-top:18px"></div>`;
 }
 function afterWeak(){
-  const allQ=D.flatMap(unitQs), allC=D.flatMap(unitDeck);
-  const b1=$('#wq'),b2=$('#wc');
+  const allC=D.flatMap(unitDeck);
   $('#wb').onclick=()=>{const wb=BQ.filter(q=>S.qs[q.id]&&S.qs[q.id].last===0); startQuiz(shuffle(wb).slice(0,40),$('#work'),{showUnit:true,title:'Weak spots.',again:()=>route()});};
-  b1.onclick=()=>{const wq=allQ.filter(q=>S.qs[q.id]&&S.qs[q.id].last===0); startQuiz(shuffle(wq).slice(0,40),$('#work'),{showUnit:true,title:'Weak spots.',again:()=>route()});};
-  b2.onclick=()=>{const wc=allC.filter(c=>S.cards[c.id]&&S.cards[c.id].last===0); startDrill(shuffle(wc),$('#work'),'Weak spots.');};
+  $('#wc').onclick=()=>{const wc=allC.filter(c=>S.cards[c.id]&&S.cards[c.id].last===0); startDrill(shuffle(wc),$('#work'),'Weak spots.');};
 }
 function vNumbers(){
   return `<h1>Numbers to know</h1><p class="muted prose">Every Key Point Review statement with a number in it, plus the Iowa sections' days, dollar amounts and percentages. Answers are highlighted. Use Drill to quiz yourself on them.</p>
@@ -602,11 +580,11 @@ function route(){
     if(u&&tab==='test'){
       const tops=unitTopics(n), bq=tops.flatMap(t=>topicQs(t.id));
       const fresh=q=>!S.qs[q.id]?0:S.qs[q.id].last===0?1:2;
-      const goBook=()=>{setMode('book'); startQuiz(shuffle(bq).sort((a,b)=>fresh(a)-fresh(b)).slice(0,10),$('#test'),{unit:n,showUnit:tops.length>1,title:`Unit ${n} test.`,again:goBook});};
-      const goGuide=()=>{setMode('guide'); const qs=unitQs(u); startQuiz(pick(qs,Math.min(10,qs.length)),$('#test'),{unit:n,title:`Unit ${n} test.`,again:goGuide});};
-      const setMode=m=>{const el=$('#tmode'); if(!el) return; el.innerHTML=tops.length?`<div class="note row" style="justify-content:space-between"><span>${m==='book'?`10 exam-style questions from the book's <b>${tops.map(t=>esc(t.t)).join('</b> and <b>')}</b> section${tops.length>1?'s':''}, the part${tops.length>1?'s':''} of the book that cover${tops.length>1?'':'s'} this unit.`:'Guide recall test: checks the guide’s own wording for this unit’s key terms and numbers.'}</span><span class="row">${m==='book'?`<button class="btn" id="tm-g">Guide recall test instead</button>${tops.map(t=>`<a class="btn" href="#book-${t.id}">All ${esc(t.t)} questions</a>`).join('')}`:`<button class="btn pri" id="tm-b">Back to exam questions</button>`}</span></div>`:'';
-        const a=$('#tm-g'), b=$('#tm-b'); if(a) a.onclick=goGuide; if(b) b.onclick=goBook;};
-      tops.length&&bq.length?goBook():goGuide();
+      const goBook=()=>startQuiz(shuffle(bq).sort((a,b)=>fresh(a)-fresh(b)).slice(0,10),$('#test'),{unit:n,showUnit:tops.length>1,title:`Unit ${n} test.`,again:goBook});
+      if(bq.length){
+        $('#tmode').innerHTML=`<div class="note row" style="justify-content:space-between"><span>10 exam questions from your Exam Prep book's <b>${tops.map(t=>esc(t.t)).join('</b> and <b>')}</b> section${tops.length>1?'s':''}, the part${tops.length>1?'s':''} of the book that cover${tops.length>1?'':'s'} this unit.</span><span class="row">${tops.map(t=>`<a class="btn" href="#book-${t.id}">All ${esc(t.t)} questions</a>`).join('')}</span></div>`;
+        goBook();
+      } else $('#test').innerHTML=`<div class="panel"><p class="prose">Your Exam Prep book has no question section for this unit's topic. Use Learn and Drill for this unit, and practice with the <a href="#book">exam questions</a>.</p></div>`;
     }
   }
   else if(h==='mock'){el.innerHTML=vMock(); afterMock();}
